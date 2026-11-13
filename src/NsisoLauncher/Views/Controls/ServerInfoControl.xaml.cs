@@ -1,9 +1,7 @@
 ﻿using NsisoLauncher.Config;
 using NsisoLauncherCore.Net.Server;
 using System;
-using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -28,7 +26,7 @@ namespace NsisoLauncher.Views.Controls
             {
                 serverNameTextBlock.Text = server.ServerName;
                 serverStateIcon.Foreground = System.Windows.Media.Brushes.White;
-                serverStateIcon.Kind = MahApps.Metro.IconPacks.PackIconFontAwesomeKind.SyncAltSolid;
+                serverStateIcon.Kind = MahApps.Metro.IconPacks.PackIconFontAwesomeKind.ArrowsRotateSolid;
                 serverPeopleTextBlock.Text = App.GetResourceString("String.Mainwindow.ServerGettingNum");
                 serverVersionTextBlock.Text = App.GetResourceString("String.Mainwindow.ServerGettingVer");
                 serverPingTextBlock.Text = App.GetResourceString("String.Mainwindow.ServerGettingPing");
@@ -48,7 +46,7 @@ namespace NsisoLauncher.Views.Controls
                 switch (serverInfo.State)
                 {
                     case ServerInfo.StateType.GOOD:
-                        this.serverStateIcon.Kind = MahApps.Metro.IconPacks.PackIconFontAwesomeKind.CheckCircleSolid;
+                        this.serverStateIcon.Kind = MahApps.Metro.IconPacks.PackIconFontAwesomeKind.CircleCheckSolid;
                         this.serverStateIcon.Foreground = System.Windows.Media.Brushes.Green;
                         this.serverPeopleTextBlock.Text = string.Format("人数:[{0}/{1}]", serverInfo.CurrentPlayerCount, serverInfo.MaxPlayerCount);
                         this.serverVersionTextBlock.Text = serverInfo.GameVersion;
@@ -64,14 +62,14 @@ namespace NsisoLauncher.Views.Controls
                         {
                             using (MemoryStream ms = new MemoryStream(serverInfo.IconData))
                             {
-                                this.serverIcon.Fill = new ImageBrush(ChangeBitmapToImageSource(new Bitmap(ms)));
+                                this.serverIcon.Fill = new ImageBrush(ChangeBitmapToImageSource(ms));
                             }
 
                         }
                         break;
 
                     case ServerInfo.StateType.NO_RESPONSE:
-                        this.serverStateIcon.Kind = MahApps.Metro.IconPacks.PackIconFontAwesomeKind.ExclamationCircleSolid;
+                        this.serverStateIcon.Kind = MahApps.Metro.IconPacks.PackIconFontAwesomeKind.CircleExclamationSolid;
                         this.serverStateIcon.Foreground = System.Windows.Media.Brushes.Red;
                         this.serverPeopleTextBlock.Text = "获取失败";
                         this.serverVersionTextBlock.Text = "获取失败";
@@ -80,7 +78,7 @@ namespace NsisoLauncher.Views.Controls
                         break;
 
                     case ServerInfo.StateType.BAD_CONNECT:
-                        this.serverStateIcon.Kind = MahApps.Metro.IconPacks.PackIconFontAwesomeKind.ExclamationCircleSolid;
+                        this.serverStateIcon.Kind = MahApps.Metro.IconPacks.PackIconFontAwesomeKind.CircleExclamationSolid;
                         this.serverStateIcon.Foreground = System.Windows.Media.Brushes.Red;
                         this.serverPeopleTextBlock.Text = "获取失败";
                         this.serverVersionTextBlock.Text = "获取失败";
@@ -89,7 +87,7 @@ namespace NsisoLauncher.Views.Controls
                         break;
 
                     case ServerInfo.StateType.EXCEPTION:
-                        this.serverStateIcon.Kind = MahApps.Metro.IconPacks.PackIconFontAwesomeKind.ExclamationCircleSolid;
+                        this.serverStateIcon.Kind = MahApps.Metro.IconPacks.PackIconFontAwesomeKind.CircleExclamationSolid;
                         this.serverStateIcon.Foreground = System.Windows.Media.Brushes.Red;
                         this.serverPeopleTextBlock.Text = "获取失败";
                         this.serverVersionTextBlock.Text = "获取失败";
@@ -107,30 +105,21 @@ namespace NsisoLauncher.Views.Controls
         }
 
         #region 图形处理
-        [DllImport("gdi32.dll", SetLastError = true)]
-        private static extern bool DeleteObject(IntPtr hObject);
 
         /// <summary>  
         /// 从bitmap转换成ImageSource  
         /// </summary>  
-        /// <param name="icon"></param>  
+        /// <param name="stream"></param>  
         /// <returns></returns>  
-        private static ImageSource ChangeBitmapToImageSource(Bitmap bitmap)
+        private static ImageSource ChangeBitmapToImageSource(Stream stream)
         {
-            //Bitmap bitmap = icon.ToBitmap();  
-            IntPtr hBitmap = bitmap.GetHbitmap();
-
-            ImageSource wpfBitmap = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-                hBitmap,
-                IntPtr.Zero,
-                Int32Rect.Empty,
-                BitmapSizeOptions.FromEmptyOptions());
-            if (!DeleteObject(hBitmap))
-            {
-                throw new System.ComponentModel.Win32Exception();
-            }
-            return wpfBitmap;
-
+            BitmapImage bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.StreamSource = stream;
+            bitmap.EndInit();
+            bitmap.Freeze();
+            return bitmap;
         }
         #endregion
     }

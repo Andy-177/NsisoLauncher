@@ -1,5 +1,5 @@
 ﻿
-using MahApps.Metro;
+using ControlzEx.Theming;
 using NsisoLauncher.Config;
 using NsisoLauncher.Core.Util;
 using NsisoLauncher.Views.Windows;
@@ -15,6 +15,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using Version = NsisoLauncherCore.Modules.Version;
 
 namespace NsisoLauncher
@@ -48,6 +49,11 @@ namespace NsisoLauncher
 
         private void InitializeApplication(StartupEventArgs e)
         {
+            #region 主题初始化
+            //MahApps.Metro 2.x 需要在创建任何窗口前应用主题
+            ThemeManager.Current.ChangeTheme(this, "Light.Blue");
+            #endregion
+
             #region DEBUG初始化
             //debug
             LogHandler = new LogHandler(true);
@@ -170,9 +176,41 @@ namespace NsisoLauncher
             {
                 LogHandler.AppendInfo("自定义->更改主题颜色:" + custom.AccentColor);
                 LogHandler.AppendInfo("自定义->更改主题:" + custom.AppThme);
-                ThemeManager.ChangeAppStyle(Current, ThemeManager.GetAccent(custom.AccentColor), ThemeManager.GetAppTheme(custom.AppThme));
+                string baseColor = NormalizeBaseColor(custom.AppThme);
+                LogHandler.AppendInfo("自定义->更改主题(适配):" + baseColor);
+                if (custom.AccentColor.StartsWith("#"))
+                {
+                    var color = (Color)ColorConverter.ConvertFromString(custom.AccentColor);
+                    var theme = RuntimeThemeGenerator.Current.GenerateRuntimeTheme(baseColor, color, false, ThemeManager.Current.LibraryThemeProviders);
+                    ThemeManager.Current.AddTheme(theme);
+                    ThemeManager.Current.ChangeTheme(this, theme);
+                }
+                else
+                {
+                    ThemeManager.Current.ChangeTheme(this, baseColor + "." + custom.AccentColor);
+                }
             }
             #endregion    
+        }
+
+        /// <summary>
+        /// 将旧版(BaseLight/BaseDark)主题名转换为 ControlzEx(Light/Dark)主题名
+        /// </summary>
+        private static string NormalizeBaseColor(string baseColor)
+        {
+            if (string.IsNullOrWhiteSpace(baseColor))
+            {
+                return "Light";
+            }
+            if (baseColor.Equals("BaseLight", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Light";
+            }
+            if (baseColor.Equals("BaseDark", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Dark";
+            }
+            return baseColor;
         }
 
         private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
@@ -192,7 +230,10 @@ namespace NsisoLauncher
         /// <param name="admin">是否用管理员模式重启</param>
         public static void Reboot(bool admin)
         {
-            System.Diagnostics.ProcessStartInfo info = new System.Diagnostics.ProcessStartInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            System.Diagnostics.ProcessStartInfo info = new System.Diagnostics.ProcessStartInfo(System.Reflection.Assembly.GetExecutingAssembly().Location)
+            {
+                UseShellExecute = true
+            };
             var args = System.Environment.GetCommandLineArgs();
             foreach (var item in args)
             {

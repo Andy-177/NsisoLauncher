@@ -1,8 +1,8 @@
-﻿using Microsoft.VisualBasic.Devices;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
 using System.Linq;
 using System.Management;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace NsisoLauncherCore.Util
@@ -52,7 +52,12 @@ namespace NsisoLauncherCore.Util
         /// <returns>物理内存</returns>
         public static ulong GetTotalMemory()
         {
-            return new Computer().Info.TotalPhysicalMemory / 1048576;
+            MEMORYSTATUSEX memoryStatus = new MEMORYSTATUSEX();
+            if (!GlobalMemoryStatusEx(memoryStatus))
+            {
+                return 0;
+            }
+            return memoryStatus.ullTotalPhys / 1048576;
         }
 
         /// <summary>
@@ -77,9 +82,36 @@ namespace NsisoLauncherCore.Util
         /// <returns>剩余内存</returns>
         public static ulong GetRunmemory()
         {
-            ComputerInfo ComputerMemory = new ComputerInfo();
-            return ComputerMemory.AvailablePhysicalMemory / 1048576;
+            MEMORYSTATUSEX memoryStatus = new MEMORYSTATUSEX();
+            if (!GlobalMemoryStatusEx(memoryStatus))
+            {
+                return 0;
+            }
+            return memoryStatus.ullAvailPhys / 1048576;
         }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        private class MEMORYSTATUSEX
+        {
+            public uint dwLength;
+            public uint dwMemoryLoad;
+            public ulong ullTotalPhys;
+            public ulong ullAvailPhys;
+            public ulong ullTotalPageFile;
+            public ulong ullAvailPageFile;
+            public ulong ullTotalVirtual;
+            public ulong ullAvailVirtual;
+            public ulong ullAvailExtendedVirtual;
+
+            public MEMORYSTATUSEX()
+            {
+                dwLength = (uint)Marshal.SizeOf(typeof(MEMORYSTATUSEX));
+            }
+        }
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GlobalMemoryStatusEx([In, Out] MEMORYSTATUSEX lpBuffer);
 
         /// <summary>
         /// 获取显卡信息

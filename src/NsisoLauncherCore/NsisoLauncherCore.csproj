@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>NsisoLauncherCore</RootNamespace>
+    <AssemblyName>NsisoLauncherCore</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Version>4.9.0</Version>
+    <AssemblyVersion>4.9.0.0</AssemblyVersion>
+    <FileVersion>4.9.0.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="SharpZipLib" Version="1.4.2" />
+    <PackageReference Include="System.Management" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Net\Dns\Records\totla.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

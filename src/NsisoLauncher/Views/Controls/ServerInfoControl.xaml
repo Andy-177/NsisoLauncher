@@ -15,7 +15,7 @@
                 <ImageBrush ImageSource="/NsisoLauncher;component/Resource/defaultIcon.png" Stretch="None"/>
             </Ellipse.Fill>
         </Ellipse>
-        <iconPacks:PackIconFontAwesome x:Name="serverStateIcon" Kind="SyncAltSolid" Margin="70,70,0,0" Height="30" Width="30" VerticalAlignment="Top" Foreground="White" Opacity="0.8"/>
+        <iconPacks:PackIconFontAwesome x:Name="serverStateIcon" Kind="ArrowsRotateSolid" Margin="70,70,0,0" Height="30" Width="30" VerticalAlignment="Top" Foreground="White" Opacity="0.8"/>
         <iconPacks:PackIconFontAwesome Kind="TagSolid" Foreground="White" Opacity="0.8" Margin="105,0,0,0" Width="20" Height="20"/>
         <TextBlock x:Name="serverNameTextBlock" Margin="130,0,0,0" TextWrapping="Wrap" Text="{DynamicResource String.Mainwindow.ServerName}" FontSize="15" Foreground="White" Opacity="0.8" VerticalAlignment="Top" Height="20"/>
         <iconPacks:PackIconFontAwesome Kind="UsersSolid" Foreground="White" Opacity="0.8" Margin="105,25,0,0" Width="20" Height="20"/>

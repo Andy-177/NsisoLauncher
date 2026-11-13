@@ -322,7 +322,7 @@ namespace NsisoLauncher.ViewModels.Pages
                                 case MessageDialogResult.Negative:
                                     return;
                                 case MessageDialogResult.FirstAuxiliary:
-                                    System.Diagnostics.Process.Start(string.Format("https://login2.nide8.com:233/{0}/register", nide8ID));
+                                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(string.Format("https://login2.nide8.com:233/{0}/register", nide8ID)) { UseShellExecute = true });
                                     return;
                                 case MessageDialogResult.Affirmative:
                                     if (isRemember)
@@ -929,13 +929,13 @@ namespace NsisoLauncher.ViewModels.Pages
                             App.Downloader.AddDownloadTask(new DownloadTask("32位JAVA安装包", @"https://bmclapi.bangbang93.com/java/jre_x86.exe", "jre_x86.exe"));
                             App.Downloader.StartDownload();
                             await new DownloadWindow().ShowWhenDownloading();
-                            System.Diagnostics.Process.Start("Explorer.exe", "jre_x86.exe");
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("jre_x86.exe") { UseShellExecute = true });
                             break;
                         case ArchEnum.x64:
                             App.Downloader.AddDownloadTask(new DownloadTask("64位JAVA安装包", @"https://bmclapi.bangbang93.com/java/jre_x64.exe", "jre_x64.exe"));
                             App.Downloader.StartDownload();
                             await new DownloadWindow().ShowWhenDownloading();
-                            System.Diagnostics.Process.Start("Explorer.exe", "jre_x64.exe");
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("jre_x64.exe") { UseShellExecute = true });
                             break;
                         default:
                             break;

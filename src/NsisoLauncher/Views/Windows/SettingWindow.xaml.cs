@@ -1,4 +1,4 @@
-﻿using MahApps.Metro;
+﻿using ControlzEx.Theming;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using NsisoLauncher.Config;
@@ -14,8 +14,8 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Documents;
-using System.Windows.Forms;
 using System.Windows.Input;
 
 namespace NsisoLauncher.Views.Windows
@@ -36,8 +36,8 @@ namespace NsisoLauncher.Views.Windows
 
         private void FirstBinding()
         {
-            AccentColorComboBox.ItemsSource = ThemeManager.Accents;
-            appThmeComboBox.ItemsSource = ThemeManager.AppThemes;
+            AccentColorComboBox.ItemsSource = ThemeManager.Current.ColorSchemes;
+            appThmeComboBox.ItemsSource = ThemeManager.Current.BaseColors;
             authModuleCombobox.ItemsSource = App.Config.MainConfig.User.AuthenticationDic;
             versionTextBlock.Text = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             App.Config.MainConfig.Environment.PropertyChanged += Environment_PropertyChanged;
@@ -138,31 +138,29 @@ namespace NsisoLauncher.Views.Windows
 
         private void gamedirChooseButton_Click(object sender, RoutedEventArgs e)
         {
-            FolderBrowserDialog dialog = new FolderBrowserDialog()
+            Microsoft.Win32.OpenFolderDialog dialog = new Microsoft.Win32.OpenFolderDialog()
             {
-                Description = "选择游戏运行根目录",
-                ShowNewFolderButton = true
+                Title = "选择游戏运行根目录"
             };
-            var result = dialog.ShowDialog();
-            if (result == System.Windows.Forms.DialogResult.Cancel)
+            if (dialog.ShowDialog() != true)
             {
                 return;
             }
             else
             {
-                gamedirPathTextBox.Text = dialog.SelectedPath.Trim();
-                App.Config.MainConfig.Environment.GamePath = dialog.SelectedPath.Trim();
+                gamedirPathTextBox.Text = dialog.FolderName.Trim();
+                App.Config.MainConfig.Environment.GamePath = dialog.FolderName.Trim();
             }
         }
         #region 全局设置部分
-        private void memorySlider_UpperValueChanged(object sender, RangeParameterChangedEventArgs e)
+        private void memorySlider_UpperValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            App.Config.MainConfig.Environment.MaxMemory = Convert.ToInt32(((RangeSlider)sender).UpperValue);
+            App.Config.MainConfig.Environment.MaxMemory = Convert.ToInt32(e.NewValue);
         }
 
-        private void memorySlider_LowerValueChanged(object sender, RangeParameterChangedEventArgs e)
+        private void memorySlider_LowerValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            App.Config.MainConfig.Environment.MinMemory = Convert.ToInt32(((RangeSlider)sender).LowerValue);
+            App.Config.MainConfig.Environment.MinMemory = Convert.ToInt32(e.NewValue);
         }
         #endregion
 
@@ -242,23 +240,43 @@ namespace NsisoLauncher.Views.Windows
 
         private void AccentColorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            Accent item = (Accent)((System.Windows.Controls.ComboBox)sender).SelectedItem;
-            if (item != null)
+            string item = ((System.Windows.Controls.ComboBox)sender).SelectedItem as string;
+            if (!string.IsNullOrEmpty(item))
             {
-                var AppStyle = ThemeManager.DetectAppStyle(System.Windows.Application.Current);
-                var theme = AppStyle.Item1;
-                ThemeManager.ChangeAppStyle(System.Windows.Application.Current, ThemeManager.GetAccent(item.Name), theme);
+                var theme = ThemeManager.Current.DetectTheme(System.Windows.Application.Current);
+                string baseColor = theme?.BaseColorScheme ?? "Light";
+                if (item.StartsWith("#"))
+                {
+                    var color = (Color)ColorConverter.ConvertFromString(item);
+                    var newTheme = RuntimeThemeGenerator.Current.GenerateRuntimeTheme(baseColor, color, false, ThemeManager.Current.LibraryThemeProviders);
+                    ThemeManager.Current.AddTheme(newTheme);
+                    ThemeManager.Current.ChangeTheme(System.Windows.Application.Current, newTheme);
+                }
+                else
+                {
+                    ThemeManager.Current.ChangeTheme(System.Windows.Application.Current, baseColor + "." + item);
+                }
             }
         }
 
         private void appThmeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            AppTheme item = (AppTheme)((System.Windows.Controls.ComboBox)sender).SelectedItem;
-            if (item != null)
+            string item = ((System.Windows.Controls.ComboBox)sender).SelectedItem as string;
+            if (!string.IsNullOrEmpty(item))
             {
-                var AppStyle = ThemeManager.DetectAppStyle(System.Windows.Application.Current);
-                var accent = AppStyle.Item2;
-                ThemeManager.ChangeAppStyle(System.Windows.Application.Current, accent, item);
+                var theme = ThemeManager.Current.DetectTheme(System.Windows.Application.Current);
+                string colorScheme = theme?.ColorScheme ?? "#FF41B1E1";
+                if (colorScheme.StartsWith("#"))
+                {
+                    var color = (Color)ColorConverter.ConvertFromString(colorScheme);
+                    var newTheme = RuntimeThemeGenerator.Current.GenerateRuntimeTheme(item, color, false, ThemeManager.Current.LibraryThemeProviders);
+                    ThemeManager.Current.AddTheme(newTheme);
+                    ThemeManager.Current.ChangeTheme(System.Windows.Application.Current, newTheme);
+                }
+                else
+                {
+                    ThemeManager.Current.ChangeTheme(System.Windows.Application.Current, item + "." + colorScheme);
+                }
             }
         }
 
@@ -324,7 +342,7 @@ namespace NsisoLauncher.Views.Windows
         {
             Hyperlink link = sender as Hyperlink;
             // 激活的是当前默认的浏览器
-            Process.Start(new ProcessStartInfo(link.NavigateUri.AbsoluteUri));
+            Process.Start(new ProcessStartInfo(link.NavigateUri.AbsoluteUri) { UseShellExecute = true });
         }
         #region 自定义验证模型
 

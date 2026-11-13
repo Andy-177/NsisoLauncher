@@ -15,7 +15,7 @@ namespace NsisoLauncherCore.Util
         public static string GetSHA1(string path)
         {
             FileStream file = new FileStream(path, FileMode.Open);
-            SHA1 sha1 = new SHA1CryptoServiceProvider();
+            SHA1 sha1 = SHA1.Create();
             byte[] retval = sha1.ComputeHash(file);
             file.Close();
 

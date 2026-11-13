@@ -170,4 +170,22 @@ namespace NsisoLauncher.Utils
             return value?.Equals(true) == true ? parameter : Binding.DoNothing;
         }
     }
+
+    public class BoolToVisibilityConverter : IValueConverter
+    {
+        #region IValueConverter Members
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool flag = false;
+            if (value is bool b) flag = b;
+            else if (value != null) flag = true;
+            return flag ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+        #endregion
+    }
 }

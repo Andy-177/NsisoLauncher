@@ -25,7 +25,7 @@ namespace NsisoLauncherCore.Util.Checker
                 throw new ArgumentException("检验器校验目标文件路径为空");
             }
             FileStream file = new FileStream(FilePath, FileMode.Open);
-            SHA1 sha1 = new SHA1CryptoServiceProvider();//创建SHA1对象
+            SHA1 sha1 = SHA1.Create();//创建SHA1对象
             byte[] sha1Bytes = sha1.ComputeHash(file);//Hash运算
             sha1.Dispose();//释放当前实例使用的所有资源
             file.Dispose();

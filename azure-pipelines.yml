@@ -14,47 +14,52 @@ variables:
   buildPlatform: 'Any CPU'
   ReleaseBuildConfiguration: 'Release'
   DebugBuildConfiguration: 'Debug'
+  dotnetVersion: '10.0.x'
 
 steps:
-- task: NuGetToolInstaller@1
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '$(dotnetVersion)'
 
 - task: NuGetCommand@2
   inputs:
     command: 'restore'
-    restoreSolution: '**/*.sln'
+    restoreSolution: '$(solution)'
     feedsToUse: 'select'
 
-- task: VSBuild@1
+- task: DotNetCoreCLI@2
   inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(ReleaseBuildConfiguration)'
+    command: 'build'
+    projects: '$(solution)'
+    arguments: '--configuration $(ReleaseBuildConfiguration) --no-restore'
 
-- task: VSBuild@1
+- task: DotNetCoreCLI@2
   inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(DebugBuildConfiguration)'
+    command: 'build'
+    projects: '$(solution)'
+    arguments: '--configuration $(DebugBuildConfiguration) --no-restore'
 
-- task: VSTest@2
+- task: DotNetCoreCLI@2
   inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(ReleaseBuildConfiguration)'
+    command: 'test'
+    projects: '$(solution)'
+    arguments: '--configuration $(ReleaseBuildConfiguration) --no-build --no-restore'
 
-- task: VSTest@2
+- task: DotNetCoreCLI@2
   inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(DebugBuildConfiguration)'
-
+    command: 'test'
+    projects: '$(solution)'
+    arguments: '--configuration $(DebugBuildConfiguration) --no-build --no-restore'
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(System.DefaultWorkingDirectory)\src\NsisoLauncher\bin\$(ReleaseBuildConfiguration)'
+    PathtoPublish: '$(System.DefaultWorkingDirectory)\src\NsisoLauncher\bin\$(ReleaseBuildConfiguration)\net10.0-windows'
     ArtifactName: 'drop_Release'
     publishLocation: 'Container'
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(System.DefaultWorkingDirectory)\src\NsisoLauncher\bin\$(DebugBuildConfiguration)'
+    PathtoPublish: '$(System.DefaultWorkingDirectory)\src\NsisoLauncher\bin\$(DebugBuildConfiguration)\net10.0-windows'
     ArtifactName: 'drop_Debug'
     publishLocation: 'Container'

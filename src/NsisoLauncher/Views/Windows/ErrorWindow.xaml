@@ -10,7 +10,7 @@
         Title="错误窗口" Height="445" Width="720" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid HorizontalAlignment="Left" Height="100" Margin="10,10,0,0" VerticalAlignment="Top" Width="100">
-            <iconPacks:PackIconFontAwesome Kind="TimesCircleSolid" Height="100" Width="100" Foreground="DarkRed"/>
+            <iconPacks:PackIconFontAwesome Kind="CircleXmarkSolid" Height="100" Width="100" Foreground="DarkRed"/>
         </Grid>
         <Label x:Name="label" Content="程序在运行时遇到该死的的错误 :(" Margin="115,10,52,0" VerticalAlignment="Top" FontSize="36"/>
         <TextBlock x:Name="FunnyBlock"
@@ -23,11 +23,11 @@
         <TextBox x:Name="textBox" Margin="10,115,10,50" TextWrapping="Wrap" IsReadOnly="True"/>
         <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10">
             <Button x:Name="CopyButton" Content="复制错误信息"
-                Style="{DynamicResource SquareButtonStyle}" Click="CopyButton_Click" Width="100" Height="35"/>
-            <Button x:Name="CloseButton" Content="忽视这个错误" Style="{DynamicResource SquareButtonStyle}"
+                Style="{DynamicResource MahApps.Styles.Button.Square}" Click="CopyButton_Click" Width="100" Height="35"/>
+            <Button x:Name="CloseButton" Content="忽视这个错误" Style="{DynamicResource MahApps.Styles.Button.Square}"
                 Click="CloseButton_Click" Height="35" Width="100" Margin="5,0"/>
             <Button x:Name="RebootButton" Content="报告并重启启动器"
-                 Style="{StaticResource AccentedSquareButtonStyle}" FontSize="12" Click="RebootButton_Click" Height="35" Width="140"/>
+                 Style="{DynamicResource MahApps.Styles.Button.Square.Accent}" FontSize="12" Click="RebootButton_Click" Height="35" Width="140"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="10">

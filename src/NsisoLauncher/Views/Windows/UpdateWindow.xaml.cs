@@ -44,7 +44,7 @@ namespace NsisoLauncher.Views.Windows
             //        this.show
             //    }
             //}
-            Process.Start(new ProcessStartInfo(VersionResponse.DownloadSource_manual));
+            Process.Start(new ProcessStartInfo(VersionResponse.DownloadSource_manual) { UseShellExecute = true });
             if ((bool)noCheckBox.IsChecked)
             {
                 App.Config.MainConfig.Launcher.CheckUpdate = false;
